@@ -2,9 +2,19 @@ const express = require("express");
 const serverResponses = require("../utils/helpers/responses");
 const messages = require("../config/messages");
 const { Todo } = require("../models/todos/todo");
+const rateLimit = require("express-rate-limit");
 
 const routes = (app) => {
   const router = express.Router();
+
+  // Set up rate limiter: maximum of 100 requests per 15 minutes
+  const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+  });
+
+  // Apply rate limiter to all requests
+  router.use(limiter);
 
   router.post("/todos", (req, res) => {
     const todo = new Todo({
